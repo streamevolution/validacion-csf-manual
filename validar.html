@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Enlace de Validación</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Permite hacer scroll si la pantalla es pequeña */
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="date"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result-container {
+            margin-top: 20px;
+            display: none;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            word-break: break-all;
+        }
+        .result-container p {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .result-container a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .result-container a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Validación de Datos</h2>
+    
+    <div class="form-group">
+        <label for="curp">CURP:</label>
+        <input type="text" id="curp" placeholder="Ingresa la CURP">
+    </div>
+    <div class="form-group">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" placeholder="Ingresa el nombre">
+    </div>
+    <div class="form-group">
+        <label for="apellidoPaterno">Apellido Paterno:</label>
+        <input type="text" id="apellidoPaterno" placeholder="Ingresa el apellido paterno">
+    </div>
+    <div class="form-group">
+        <label for="apellidoMaterno">Apellido Materno:</label>
+        <input type="text" id="apellidoMaterno" placeholder="Ingresa el apellido materno">
+    </div>
+    <div class="form-group">
+        <label for="fechaNacimiento">Fecha Nacimiento:</label>
+        <input type="date" id="fechaNacimiento">
+    </div>
+    <div class="form-group">
+        <label for="fechaInicioOperaciones">Fecha de inicio de operaciones:</label>
+        <input type="date" id="fechaInicioOperaciones">
+    </div>
+    <div class="form-group">
+        <label for="situacionContribuyente">Situación del contribuyente:</label>
+        <input type="text" id="situacionContribuyente" placeholder="Ingresa la situación">
+    </div>
+    <div class="form-group">
+        <label for="fechaUltimoCambio">Fecha de último cambio de situacion:</label>
+        <input type="date" id="fechaUltimoCambio">
+    </div>
+    <div class="form-group">
+        <label for="entidadFederativa">Entidad federativa:</label>
+        <input type="text" id="entidadFederativa" placeholder="Ingresa la entidad federativa">
+    </div>
+    <div class="form-group">
+        <label for="municipioDelegacion">Municipio delegación:</label>
+        <input type="text" id="municipioDelegacion" placeholder="Ingresa el municipio o delegación">
+    </div>
+    <div class="form-group">
+        <label for="colonia">Colonia:</label>
+        <input type="text" id="colonia" placeholder="Ingresa la colonia">
+    </div>
+    <div class="form-group">
+        <label for="tipoVialidad">Tipo de vialidad:</label>
+        <input type="text" id="tipoVialidad" placeholder="Ej. Calle, Avenida, Bulevar">
+    </div>
+    <div class="form-group">
+        <label for="nombreVialidad">Nombre de la vialidad:</label>
+        <input type="text" id="nombreVialidad" placeholder="Ingresa el nombre de la vialidad">
+    </div>
+    <div class="form-group">
+        <label for="numeroExterior">Número exteriorios:</label>
+        <input type="text" id="numeroExterior" placeholder="Ingresa el número exterior">
+    </div>
+    <div class="form-group">
+        <label for="cp">CP:</label>
+        <input type="text" id="cp" placeholder="Ingresa el código postal">
+    </div>
+    <div class="form-group">
+        <label for="correoElectronico">Correo electrónico:</label>
+        <input type="email" id="correoElectronico" placeholder="Ingresa el correo electrónico">
+    </div>
+    <div class="form-group">
+        <label for="al">AL:</label>
+        <input type="text" id="al" placeholder="Ingresa AL">
+    </div>
+    <div class="form-group">
+        <label for="regimen">Régimen:</label>
+        <input type="text" id="regimen" placeholder="Ingresa el régimen">
+    </div>
+    <div class="form-group">
+        <label for="fechaAlta">Fecha de alta:</label>
+        <input type="date" id="fechaAlta">
+    </div>
+
+    <button onclick="generarEnlace()">Generar Enlace</button>
+
+    <div class="result-container" id="resultadoArea">
+        <p><strong>Enlace generado exitosamente:</strong></p>
+        <a href="#" id="enlaceGenerado" target="_blank"></a>
+    </div>
+</div>
+
+<script>
+    function generarEnlace() {
+        // 1. Recolectar todos los datos del formulario en un objeto
+        const datosGenerados = {
+            curp: document.getElementById('curp').value.trim(),
+            nombre: document.getElementById('nombre').value.trim(),
+            apellidoPaterno: document.getElementById('apellidoPaterno').value.trim(),
+            apellidoMaterno: document.getElementById('apellidoMaterno').value.trim(),
+            fechaNacimiento: document.getElementById('fechaNacimiento').value,
+            fechaInicioOperaciones: document.getElementById('fechaInicioOperaciones').value,
+            situacionContribuyente: document.getElementById('situacionContribuyente').value.trim(),
+            fechaUltimoCambio: document.getElementById('fechaUltimoCambio').value,
+            entidadFederativa: document.getElementById('entidadFederativa').value.trim(),
+            municipioDelegacion: document.getElementById('municipioDelegacion').value.trim(),
+            colonia: document.getElementById('colonia').value.trim(),
+            tipoVialidad: document.getElementById('tipoVialidad').value.trim(),
+            nombreVialidad: document.getElementById('nombreVialidad').value.trim(),
+            numeroExterior: document.getElementById('numeroExterior').value.trim(),
+            cp: document.getElementById('cp').value.trim(),
+            correoElectronico: document.getElementById('correoElectronico').value.trim(),
+            al: document.getElementById('al').value.trim(),
+            regimen: document.getElementById('regimen').value.trim(),
+            fechaAlta: document.getElementById('fechaAlta').value
+        };
+
+        // 2. Definir la URL base
+        const urlBase = 'https://tusitio.com/validar';
+
+        // 3. Crear los parámetros pasando el objeto completo a URLSearchParams
+        const parametros = new URLSearchParams(datosGenerados);
+
+        // 4. Construir la URL final
+        const urlFinal = urlBase + '?' + parametros.toString();
+
+        // 5. Mostrar el enlace en la interfaz
+        const resultadoArea = document.getElementById('resultadoArea');
+        const enlaceGenerado = document.getElementById('enlaceGenerado');
+
+        enlaceGenerado.href = urlFinal;
+        enlaceGenerado.textContent = urlFinal;
+        
+        resultadoArea.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
