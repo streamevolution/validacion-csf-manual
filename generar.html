@@ -3,220 +3,533 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Enlace de Validación</title>
+    <title>Generador de Enlace de Validación CSF</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
+        /* --- TEMA: MIDNIGHT / CYBER DASHBOARD --- */
+        :root {
+            --bg-page: #020617; 
+            --bg-card: #0f172a; 
+            --bg-input: #1e293b; 
+            --text-main: #f8fafc; 
+            --text-label: #94a3b8; 
+            --accent: #00e5ff; 
+            --accent-hover: #00b8cc;
+            --border-color: #334155;
+            --success: #10b981; 
+        }
+
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7f6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-page) 0%, #0a0f1c 100%);
+            color: var(--text-main);
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Permite hacer scroll si la pantalla es pequeña */
+            align-items: flex-start; 
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
+            padding: 40px 15px;
             box-sizing: border-box;
         }
+
         .container {
-            background-color: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background-color: var(--bg-card);
+            padding: 40px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
             width: 100%;
-            max-width: 500px;
+            max-width: 880px;
             box-sizing: border-box;
         }
+
         h2 {
             text-align: center;
-            color: #333;
+            color: var(--text-main);
+            margin-top: 0;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
-        .form-group {
-            margin-bottom: 15px;
+        
+        h2 span {
+            color: var(--accent);
         }
-        label {
+
+        .header-img {
             display: block;
-            margin-bottom: 5px;
-            color: #666;
-            font-weight: bold;
-            font-size: 14px;
+            margin: 0 auto 35px auto;
+            max-width: 100%;
+            height: auto;
+            max-height: 120px;
         }
+
+        .section-title {
+            grid-column: 1 / -1; 
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        /* --- GRID --- */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 18px 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 6px;
+            color: var(--text-label);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        /* --- INPUTS --- */
         input[type="text"],
         input[type="email"],
         input[type="date"] {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
             box-sizing: border-box;
+            font-size: 14px;
+            color: var(--text-main);
+            background-color: var(--bg-input);
+            transition: all 0.3s ease;
+            color-scheme: dark;
         }
-        button {
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        input[type="date"]:focus {
+            outline: none;
+            border-color: var(--accent);
+            background-color: #172033;
+            box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.15);
+        }
+
+        input::placeholder {
+            color: #475569;
+        }
+
+        /* --- BOTONES --- */
+        .action-container {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        button.btn-generate {
             width: 100%;
-            padding: 12px;
-            background-color: #007bff;
-            color: #fff;
+            max-width: 350px;
+            padding: 15px;
+            background: linear-gradient(90deg, #0072ff 0%, var(--accent) 100%);
+            color: #000; 
             border: none;
-            border-radius: 4px;
+            border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
-            margin-top: 10px;
-            transition: background-color 0.3s;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: transform 0.2s, box-shadow 0.2s, background 0.3s, color 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 229, 255, 0.3);
         }
-        button:hover {
-            background-color: #0056b3;
+
+        button.btn-generate:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 229, 255, 0.5);
         }
+
+        button.btn-generate:active:not(:disabled) {
+            transform: translateY(1px);
+        }
+
+        /* --- ESTILO PARA BOTÓN DESHABILITADO --- */
+        button.btn-generate:disabled {
+            background: #334155; /* Color gris oscuro */
+            color: #64748b; /* Texto apagado */
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+        /* ---------------------------------------- */
+
+        /* --- RESULTADO --- */
         .result-container {
-            margin-top: 20px;
+            margin-top: 30px;
             display: none;
-            padding: 15px;
-            background-color: #e9ecef;
-            border-radius: 4px;
+            padding: 25px;
+            background-color: rgba(0, 229, 255, 0.05);
+            border: 1px dashed var(--accent);
+            border-radius: 8px;
             word-break: break-all;
+            text-align: center;
         }
+
         .result-container p {
-            margin: 0 0 10px 0;
-            color: #333;
+            margin: 0 0 15px 0;
+            color: var(--text-main);
+            font-weight: 600;
         }
+
         .result-container a {
-            color: #007bff;
+            color: var(--accent);
             text-decoration: none;
-            font-weight: bold;
+            font-size: 13px;
+            display: block;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
         }
+
         .result-container a:hover {
+            background: rgba(0,0,0,0.5);
             text-decoration: underline;
+        }
+
+        .btn-copy {
+            background-color: transparent;
+            color: var(--success);
+            border: 1px solid var(--success);
+            height: 40px;
+            padding: 0 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+            margin-bottom: 20px; 
+        }
+
+        .btn-copy:hover {
+            background-color: var(--success);
+            color: #000;
+        }
+
+        /* --- ESTILOS PARA EL QR Y SU BOTÓN DE DESCARGA --- */
+        .qr-wrapper {
+            background-color: #ffffff; 
+            padding: 15px;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 0 auto 20px auto;
+        }
+
+        .btn-download {
+            background-color: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            height: 40px;
+            padding: 0 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.2s;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .btn-download:hover {
+            background-color: var(--accent);
+            color: #000;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px 15px;
+            }
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>Validación de Datos</h2>
+    <h2>Panel de <span>Encriptación</span></h2>
     
-    <div class="form-group">
-        <label for="curp">CURP:</label>
-        <input type="text" id="curp" placeholder="Ingresa la CURP">
-    </div>
-    <div class="form-group">
-        <label for="nombre">Nombre:</label>
-        <input type="text" id="nombre" placeholder="Ingresa el nombre">
-    </div>
-    <div class="form-group">
-        <label for="apellidoPaterno">Apellido Paterno:</label>
-        <input type="text" id="apellidoPaterno" placeholder="Ingresa el apellido paterno">
-    </div>
-    <div class="form-group">
-        <label for="apellidoMaterno">Apellido Materno:</label>
-        <input type="text" id="apellidoMaterno" placeholder="Ingresa el apellido materno">
-    </div>
-    <div class="form-group">
-        <label for="fechaNacimiento">Fecha Nacimiento:</label>
-        <input type="date" id="fechaNacimiento">
-    </div>
-    <div class="form-group">
-        <label for="fechaInicioOperaciones">Fecha de inicio de operaciones:</label>
-        <input type="date" id="fechaInicioOperaciones">
-    </div>
-    <div class="form-group">
-        <label for="situacionContribuyente">Situación del contribuyente:</label>
-        <input type="text" id="situacionContribuyente" placeholder="Ingresa la situación">
-    </div>
-    <div class="form-group">
-        <label for="fechaUltimoCambio">Fecha de último cambio de situacion:</label>
-        <input type="date" id="fechaUltimoCambio">
-    </div>
-    <div class="form-group">
-        <label for="entidadFederativa">Entidad federativa:</label>
-        <input type="text" id="entidadFederativa" placeholder="Ingresa la entidad federativa">
-    </div>
-    <div class="form-group">
-        <label for="municipioDelegacion">Municipio delegación:</label>
-        <input type="text" id="municipioDelegacion" placeholder="Ingresa el municipio o delegación">
-    </div>
-    <div class="form-group">
-        <label for="colonia">Colonia:</label>
-        <input type="text" id="colonia" placeholder="Ingresa la colonia">
-    </div>
-    <div class="form-group">
-        <label for="tipoVialidad">Tipo de vialidad:</label>
-        <input type="text" id="tipoVialidad" placeholder="Ej. Calle, Avenida, Bulevar">
-    </div>
-    <div class="form-group">
-        <label for="nombreVialidad">Nombre de la vialidad:</label>
-        <input type="text" id="nombreVialidad" placeholder="Ingresa el nombre de la vialidad">
-    </div>
-    <div class="form-group">
-        <label for="numeroExterior">Número exteriorios:</label>
-        <input type="text" id="numeroExterior" placeholder="Ingresa el número exterior">
-    </div>
-    <div class="form-group">
-        <label for="cp">CP:</label>
-        <input type="text" id="cp" placeholder="Ingresa el código postal">
-    </div>
-    <div class="form-group">
-        <label for="correoElectronico">Correo electrónico:</label>
-        <input type="email" id="correoElectronico" placeholder="Ingresa el correo electrónico">
-    </div>
-    <div class="form-group">
-        <label for="al">AL:</label>
-        <input type="text" id="al" placeholder="Ingresa AL">
-    </div>
-    <div class="form-group">
-        <label for="regimen">Régimen:</label>
-        <input type="text" id="regimen" placeholder="Ingresa el régimen">
-    </div>
-    <div class="form-group">
-        <label for="fechaAlta">Fecha de alta:</label>
-        <input type="date" id="fechaAlta">
+    <img src="https://i.postimg.cc/bJcbdy1N/1772507217379.png" alt="Logo de Sistema" class="header-img">
+
+    <div class="form-grid">
+        <div class="section-title">Datos de Identificación</div>
+        
+        <div class="form-group">
+            <label for="rfc">RFC</label>
+            <input type="text" id="rfc" placeholder="Ingresa el RFC">
+        </div>
+        <div class="form-group">
+            <label for="curp">CURP</label>
+            <input type="text" id="curp" placeholder="Ingresa la CURP">
+        </div>
+        <div class="form-group">
+            <label for="nombre">Nombre(s)</label>
+            <input type="text" id="nombre" placeholder="Ingresa el nombre">
+        </div>
+        <div class="form-group">
+            <label for="apellidoPaterno">Apellido Paterno</label>
+            <input type="text" id="apellidoPaterno" placeholder="Ingresa el apellido paterno">
+        </div>
+        <div class="form-group">
+            <label for="apellidoMaterno">Apellido Materno</label>
+            <input type="text" id="apellidoMaterno" placeholder="Ingresa el apellido materno">
+        </div>
+        <div class="form-group">
+            <label for="fechaNacimiento">Fecha Nacimiento</label>
+            <input type="date" id="fechaNacimiento">
+        </div>
+
+        <div class="section-title">Estatus</div>
+
+        <div class="form-group">
+            <label for="fechaInicioOperaciones">Fecha de inicio de operaciones</label>
+            <input type="date" id="fechaInicioOperaciones">
+        </div>
+        <div class="form-group">
+            <label for="situacionContribuyente">Situación del contribuyente</label>
+            <input type="text" id="situacionContribuyente" placeholder="Ej. ACTIVO">
+        </div>
+        <div class="form-group">
+            <label for="fechaUltimoCambio">Fecha de último cambio de situación</label>
+            <input type="date" id="fechaUltimoCambio">
+        </div>
+
+        <div class="section-title">Datos de Ubicación</div>
+
+        <div class="form-group">
+            <label for="entidadFederativa">Entidad federativa</label>
+            <input type="text" id="entidadFederativa" placeholder="Ingresa la entidad">
+        </div>
+        <div class="form-group">
+            <label for="municipioDelegacion">Municipio / Delegación</label>
+            <input type="text" id="municipioDelegacion" placeholder="Ingresa el municipio">
+        </div>
+        <div class="form-group">
+            <label for="colonia">Colonia</label>
+            <input type="text" id="colonia" placeholder="Ingresa la colonia">
+        </div>
+        <div class="form-group">
+            <label for="tipoVialidad">Tipo de vialidad</label>
+            <input type="text" id="tipoVialidad" placeholder="Ej. Calle, Avenida, Bulevar">
+        </div>
+        <div class="form-group">
+            <label for="nombreVialidad">Nombre de la vialidad</label>
+            <input type="text" id="nombreVialidad" placeholder="Ingresa el nombre">
+        </div>
+        <div class="form-group">
+            <label for="numeroExterior">Número exterior</label>
+            <input type="text" id="numeroExterior" placeholder="Ej. 299">
+        </div>
+        <div class="form-group">
+            <label for="numeroInterior">Número interior</label>
+            <input type="text" id="numeroInterior" placeholder="(Opcional)">
+        </div>
+        <div class="form-group">
+            <label for="cp">Código Postal (CP)</label>
+            <input type="text" id="cp" placeholder="Ej. 97784">
+        </div>
+        <div class="form-group">
+            <label for="correoElectronico">Correo electrónico</label>
+            <input type="email" id="correoElectronico" placeholder="usuario@correo.com">
+        </div>
+        <div class="form-group">
+            <label for="al">AL</label>
+            <input type="text" id="al" placeholder="Ej. YUCATÁN 1">
+        </div>
+
+        <div class="section-title">Características Fiscales</div>
+
+        <div class="form-group">
+            <label for="regimen">Régimen</label>
+            <input type="text" id="regimen" placeholder="Ingresa el régimen">
+        </div>
+        <div class="form-group">
+            <label for="fechaAlta">Fecha de alta (Régimen)</label>
+            <input type="date" id="fechaAlta">
+        </div>
     </div>
 
-    <button onclick="generarEnlace()">Generar Enlace</button>
+    <div class="action-container">
+        <button id="btnGenerar" class="btn-generate" onclick="generarEnlace()" disabled>Generar Enlace Seguro</button>
+        </div>
 
     <div class="result-container" id="resultadoArea">
-        <p><strong>Enlace generado exitosamente:</strong></p>
+        <p>✓ Datos Codificados con Éxito</p>
         <a href="#" id="enlaceGenerado" target="_blank"></a>
+        <button class="btn-copy" onclick="copiarAlPortapapeles()">[ Copiar Enlace ]</button>
+        
+        <div id="codigoQR" class="qr-wrapper"></div>
+        <button class="btn-download" id="btnDescargar" onclick="descargarQR()" style="display: none;">[ Descargar QR ]</button>
     </div>
 </div>
 
 <script>
+    // --- NUEVA FUNCIÓN: Vigilante de campos llenos ---
+    document.addEventListener('DOMContentLoaded', function() {
+        // Obtenemos todos los inputs de texto, email y fechas
+        const todosLosInputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="date"]');
+        const botonGenerar = document.getElementById('btnGenerar');
+
+        function revisarCampos() {
+            let todosLlenos = true;
+            // Revisamos uno por uno
+            todosLosInputs.forEach(input => {
+                // Si encontramos al menos uno vacío, cambiamos a falso
+                if (input.value.trim() === '') {
+                    todosLlenos = false;
+                }
+            });
+            
+            // Si todos están llenos, quitamos el atributo disabled
+            botonGenerar.disabled = !todosLlenos;
+        }
+
+        // Le decimos a cada input que avise cada vez que el usuario escriba o cambie algo
+        todosLosInputs.forEach(input => {
+            input.addEventListener('input', revisarCampos);
+            input.addEventListener('change', revisarCampos); // Especial para los calendarios
+        });
+
+        // Hacemos una revisión inicial por si el navegador autocompleta algo
+        revisarCampos();
+    });
+    // -------------------------------------------------
+
     function generarEnlace() {
-        // 1. Recolectar todos los datos del formulario en un objeto
-        const datosGenerados = {
-            curp: document.getElementById('curp').value.trim(),
-            nombre: document.getElementById('nombre').value.trim(),
-            apellidoPaterno: document.getElementById('apellidoPaterno').value.trim(),
-            apellidoMaterno: document.getElementById('apellidoMaterno').value.trim(),
-            fechaNacimiento: document.getElementById('fechaNacimiento').value,
-            fechaInicioOperaciones: document.getElementById('fechaInicioOperaciones').value,
-            situacionContribuyente: document.getElementById('situacionContribuyente').value.trim(),
-            fechaUltimoCambio: document.getElementById('fechaUltimoCambio').value,
-            entidadFederativa: document.getElementById('entidadFederativa').value.trim(),
-            municipioDelegacion: document.getElementById('municipioDelegacion').value.trim(),
-            colonia: document.getElementById('colonia').value.trim(),
-            tipoVialidad: document.getElementById('tipoVialidad').value.trim(),
-            nombreVialidad: document.getElementById('nombreVialidad').value.trim(),
-            numeroExterior: document.getElementById('numeroExterior').value.trim(),
-            cp: document.getElementById('cp').value.trim(),
-            correoElectronico: document.getElementById('correoElectronico').value.trim(),
-            al: document.getElementById('al').value.trim(),
-            regimen: document.getElementById('regimen').value.trim(),
-            fechaAlta: document.getElementById('fechaAlta').value
-        };
+        const valores = [
+            document.getElementById('rfc').value.trim(),
+            document.getElementById('curp').value.trim(),
+            document.getElementById('nombre').value.trim(),
+            document.getElementById('apellidoPaterno').value.trim(),
+            document.getElementById('apellidoMaterno').value.trim(),
+            document.getElementById('fechaNacimiento').value,
+            document.getElementById('fechaInicioOperaciones').value,
+            document.getElementById('situacionContribuyente').value.trim(),
+            document.getElementById('fechaUltimoCambio').value,
+            document.getElementById('entidadFederativa').value.trim(),
+            document.getElementById('municipioDelegacion').value.trim(),
+            document.getElementById('colonia').value.trim(),
+            document.getElementById('tipoVialidad').value.trim(),
+            document.getElementById('nombreVialidad').value.trim(),
+            document.getElementById('numeroExterior').value.trim(),
+            document.getElementById('numeroInterior').value.trim(),
+            document.getElementById('cp').value.trim(),
+            document.getElementById('correoElectronico').value.trim(),
+            document.getElementById('al').value.trim(),
+            document.getElementById('regimen').value.trim(),
+            document.getElementById('fechaAlta').value
+        ];
 
-        // 2. Definir la URL base
         const urlBase = 'https://siiat-sat-gob-mx-app-qr-faces-pages-mobile.pages.dev/validar';
+        const datosString = valores.join('~');
+        const base64 = btoa(unescape(encodeURIComponent(datosString)));
+        const urlFinal = urlBase + '?v=' + base64; 
 
-        // 3. Crear los parámetros pasando el objeto completo a URLSearchParams
-        const parametros = new URLSearchParams(datosGenerados);
-
-        // 4. Construir la URL final
-        const urlFinal = urlBase + '?' + parametros.toString();
-
-        // 5. Mostrar el enlace en la interfaz
         const resultadoArea = document.getElementById('resultadoArea');
         const enlaceGenerado = document.getElementById('enlaceGenerado');
 
         enlaceGenerado.href = urlFinal;
         enlaceGenerado.textContent = urlFinal;
         
+        const qrContainer = document.getElementById('codigoQR');
+        qrContainer.innerHTML = ''; 
+        
+        new QRCode(qrContainer, {
+            text: urlFinal,
+            width: 256,   
+            height: 256,  
+            colorDark : "#000000",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.M 
+        });
+
+        document.getElementById('btnDescargar').style.display = 'block';
+        
         resultadoArea.style.display = 'block';
+        resultadoArea.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function copiarAlPortapapeles() {
+        const enlace = document.getElementById('enlaceGenerado').href;
+        navigator.clipboard.writeText(enlace).then(() => {
+            const btn = document.querySelector('.btn-copy');
+            const textoOriginal = btn.textContent;
+            btn.textContent = '¡COPIADO!';
+            btn.style.backgroundColor = 'var(--success)';
+            btn.style.color = '#000';
+            setTimeout(() => {
+                btn.textContent = textoOriginal;
+                btn.style.backgroundColor = 'transparent';
+                btn.style.color = 'var(--success)';
+            }, 2000);
+        }).catch(err => {
+            console.error('Error al copiar: ', err);
+            alert("No se pudo copiar el enlace automáticamente.");
+        });
+    }
+
+    function descargarQR() {
+        const curpIngresada = document.getElementById('curp').value.trim();
+        const curpFinal = curpIngresada !== '' ? curpIngresada : 'SIN_CURP';
+        const nombreArchivo = 'QR_' + curpFinal + '.png';
+
+        const qrCanvas = document.querySelector('#codigoQR canvas');
+        const qrImg = document.querySelector('#codigoQR img');
+
+        let sourceElem = null;
+        if (qrCanvas && qrCanvas.style.display !== 'none') {
+            sourceElem = qrCanvas;
+        } else if (qrImg && qrImg.src) {
+            sourceElem = qrImg;
+        }
+
+        if (!sourceElem) {
+            alert('Aún no se ha generado el código QR.');
+            return;
+        }
+
+        const padding = 12; 
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+
+        const finalWidth = sourceElem.width || sourceElem.naturalWidth || 256;
+        const finalHeight = sourceElem.height || sourceElem.naturalHeight || 256;
+
+        tempCanvas.width = finalWidth + (padding * 2);
+        tempCanvas.height = finalHeight + (padding * 2);
+
+        tempCtx.fillStyle = '#ffffff';
+        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+        if (sourceElem.tagName.toLowerCase() === 'img') {
+            tempCtx.drawImage(sourceElem, padding, padding, finalWidth, finalHeight);
+        } else {
+            tempCtx.drawImage(sourceElem, padding, padding);
+        }
+
+        const imgURI = tempCanvas.toDataURL("image/png");
+
+        let enlaceDescarga = document.createElement('a');
+        enlaceDescarga.href = imgURI;
+        enlaceDescarga.download = nombreArchivo;
+        document.body.appendChild(enlaceDescarga);
+        enlaceDescarga.click();
+        document.body.removeChild(enlaceDescarga);
     }
 </script>
 
