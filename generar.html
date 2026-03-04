@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Enlace de Validación CSF</title>
+    <title>Generador de Enlace de Validación</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         /* --- TEMA: MIDNIGHT / CYBER DASHBOARD --- */
@@ -79,7 +79,6 @@
             padding-bottom: 10px;
         }
 
-        /* --- GRID --- */
         .form-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -89,6 +88,7 @@
         .form-group {
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
         label {
@@ -98,10 +98,10 @@
             font-weight: 500;
         }
 
-        /* --- INPUTS --- */
         input[type="text"],
         input[type="email"],
-        input[type="date"] {
+        input[type="date"],
+        select {
             width: 100%;
             padding: 12px 15px;
             border: 1px solid var(--border-color);
@@ -116,7 +116,8 @@
 
         input[type="text"]:focus,
         input[type="email"]:focus,
-        input[type="date"]:focus {
+        input[type="date"]:focus,
+        select:focus {
             outline: none;
             border-color: var(--accent);
             background-color: #172033;
@@ -127,7 +128,37 @@
             color: #475569;
         }
 
-        /* --- BOTONES --- */
+        /* --- ESTILOS DEL BOTÓN BUSCAR CURP CHICO --- */
+        .btn-small {
+            background-color: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            border-radius: 6px;
+            padding: 8px 15px;
+            margin-top: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            transition: all 0.2s;
+            width: fit-content;
+        }
+        .btn-small:hover:not(:disabled) {
+            background-color: var(--accent);
+            color: #000;
+        }
+        .btn-small:disabled {
+            border-color: var(--border-color);
+            color: #475569;
+            cursor: not-allowed;
+        }
+        .curp-status {
+            font-size: 12px;
+            margin-top: 5px;
+            font-weight: 600;
+        }
+        /* ------------------------------------------- */
+
         .action-container {
             margin-top: 40px;
             text-align: center;
@@ -159,17 +190,14 @@
             transform: translateY(1px);
         }
 
-        /* --- ESTILO PARA BOTÓN DESHABILITADO --- */
         button.btn-generate:disabled {
-            background: #334155; /* Color gris oscuro */
-            color: #64748b; /* Texto apagado */
+            background: #334155; 
+            color: #64748b; 
             cursor: not-allowed;
             box-shadow: none;
             transform: none;
         }
-        /* ---------------------------------------- */
 
-        /* --- RESULTADO --- */
         .result-container {
             margin-top: 30px;
             display: none;
@@ -223,7 +251,6 @@
             color: #000;
         }
 
-        /* --- ESTILOS PARA EL QR Y SU BOTÓN DE DESCARGA --- */
         .qr-wrapper {
             background-color: #ffffff; 
             padding: 15px;
@@ -252,6 +279,44 @@
             color: #000;
         }
 
+        .curp-error-box {
+            display: none;
+            background-color: rgba(239, 68, 68, 0.1); 
+            border: 1px solid #ef4444;
+            color: #ef4444;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* --- NUEVO ESTILO PARA ÉXITO --- */
+        .curp-success-box {
+            display: none;
+            background-color: rgba(16, 185, 129, 0.1); 
+            border: 1px solid var(--success);
+            color: var(--success);
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 25px 15px;
@@ -271,11 +336,18 @@
         
         <div class="form-group">
             <label for="rfc">RFC</label>
-            <input type="text" id="rfc" placeholder="Ingresa el RFC">
+            <input type="text" id="rfc" placeholder="Se generará en automático" style="text-transform: uppercase;">
         </div>
+
         <div class="form-group">
             <label for="curp">CURP</label>
-            <input type="text" id="curp" placeholder="Ingresa la CURP">
+            <input type="text" id="curp" placeholder="Ingresa la CURP" maxlength="18" onclick="mostrarBotonCurp()" oninput="validarCurpLength()" style="text-transform: uppercase;">
+            <button type="button" id="btnBuscarCurp" class="btn-small" style="display: none;" onclick="extraerDatosCurp()" disabled>Buscar Datos</button>
+        </div>
+        
+        <div class="form-group">
+            <label for="validarCurp">Validar CURP</label>
+            <input type="text" id="validarCurp" placeholder="Esperando consulta..." readonly style="font-weight: 700; transition: color 0.3s, border-color 0.3s;">
         </div>
         <div class="form-group">
             <label for="nombre">Nombre(s)</label>
@@ -302,7 +374,13 @@
         </div>
         <div class="form-group">
             <label for="situacionContribuyente">Situación del contribuyente</label>
-            <input type="text" id="situacionContribuyente" placeholder="Ej. ACTIVO">
+            <select id="situacionContribuyente">
+                <option value="" disabled selected>Selecciona una situación...</option>
+                <option value="ACTIVO">ACTIVO</option>
+                <option value="SUSPENDIDO">SUSPENDIDO</option>
+                <option value="REACTIVADO">REACTIVADO</option>
+                <option value="CANCELADO">CANCELADO</option>
+            </select>
         </div>
         <div class="form-group">
             <label for="fechaUltimoCambio">Fecha de último cambio de situación</label>
@@ -321,11 +399,29 @@
         </div>
         <div class="form-group">
             <label for="colonia">Colonia</label>
-            <input type="text" id="colonia" placeholder="Ingresa la colonia">
+            <select id="colonia">
+                <option value="">Ingresa un CP primero...</option>
+            </select>
         </div>
         <div class="form-group">
             <label for="tipoVialidad">Tipo de vialidad</label>
-            <input type="text" id="tipoVialidad" placeholder="Ej. Calle, Avenida, Bulevar">
+            <select id="tipoVialidad">
+                <option value="" disabled selected>Selecciona una opción...</option>
+                <option value="CALLE">Calle</option>
+                <option value="AVENIDA">Avenida</option>
+                <option value="BULEVAR">Bulevar</option>
+                <option value="CALZADA">Calzada</option>
+                <option value="PRIVADA">Privada</option>
+                <option value="CERRADA">Cerrada</option>
+                <option value="CIRCUITO">Circuito</option>
+                <option value="RETORNO">Retorno</option>
+                <option value="CALLEJON">Callejón</option>
+                <option value="ANDADOR">Andador</option>
+                <option value="CAMINO">Camino</option>
+                <option value="CARRETERA">Carretera</option>
+                <option value="PROLONGACION">Prolongación</option>
+                <option value="VIADUCTO">Viaducto</option>
+            </select>
         </div>
         <div class="form-group">
             <label for="nombreVialidad">Nombre de la vialidad</label>
@@ -341,7 +437,8 @@
         </div>
         <div class="form-group">
             <label for="cp">Código Postal (CP)</label>
-            <input type="text" id="cp" placeholder="Ej. 97784">
+            <input type="text" id="cp" placeholder="Ej. 97784" maxlength="5" oninput="buscarCP()">
+            <div id="statusCp" class="curp-status" style="display: none;"></div>
         </div>
         <div class="form-group">
             <label for="correoElectronico">Correo electrónico</label>
@@ -356,7 +453,18 @@
 
         <div class="form-group">
             <label for="regimen">Régimen</label>
-            <input type="text" id="regimen" placeholder="Ingresa el régimen">
+            <select id="regimen">
+                <option value="" disabled selected>Selecciona un régimen...</option>
+                <option value="605 - SUELDOS Y SALARIOS">605 - Sueldos y Salarios</option>
+                <option value="626 - REGIMEN SIMPLIFICADO DE CONFIANZA">626 - Régimen Simplificado de Confianza (RESICO)</option>
+                <option value="612 - ACTIVIDADES EMPRESARIALES Y PROFESIONALES">612 - Actividades Empresariales y Profesionales</option>
+                <option value="621 - INCORPORACION FISCAL">621 - Incorporación Fiscal (RIF)</option>
+                <option value="606 - ARRENDAMIENTO">606 - Arrendamiento</option>
+                <option value="608 - ENAJENACION DE BIENES">608 - Enajenación de bienes</option>
+                <option value="614 - INGRESOS POR INTERESES">614 - Ingresos por Intereses</option>
+                <option value="611 - INGRESOS POR DIVIDENDOS">611 - Ingresos por Dividendos</option>
+                <option value="616 - SIN OBLIGACIONES FISCALES">616 - Sin obligaciones fiscales</option>
+            </select>
         </div>
         <div class="form-group">
             <label for="fechaAlta">Fecha de alta (Régimen)</label>
@@ -366,7 +474,7 @@
 
     <div class="action-container">
         <button id="btnGenerar" class="btn-generate" onclick="generarEnlace()" disabled>Generar Enlace Seguro</button>
-        </div>
+    </div>
 
     <div class="result-container" id="resultadoArea">
         <p>✓ Datos Codificados con Éxito</p>
@@ -379,36 +487,211 @@
 </div>
 
 <script>
-    // --- NUEVA FUNCIÓN: Vigilante de campos llenos ---
-    document.addEventListener('DOMContentLoaded', function() {
-        // Obtenemos todos los inputs de texto, email y fechas
-        const todosLosInputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="date"]');
-        const botonGenerar = document.getElementById('btnGenerar');
+    // --- LÓGICA DE BÚSQUEDA DE CURP ---
+    function mostrarBotonCurp() {
+        document.getElementById('btnBuscarCurp').style.display = 'block';
+    }
 
-        function revisarCampos() {
-            let todosLlenos = true;
-            // Revisamos uno por uno
-            todosLosInputs.forEach(input => {
-                // Si encontramos al menos uno vacío, cambiamos a falso
-                if (input.value.trim() === '') {
-                    todosLlenos = false;
+    function validarCurpLength() {
+        const input = document.getElementById('curp');
+        input.value = input.value.toUpperCase(); // Forzar mayúsculas
+        const btn = document.getElementById('btnBuscarCurp');
+        
+        // Solo habilita el botón de buscar si tiene 18 letras/números
+        if(input.value.trim().length === 18) {
+            btn.disabled = false;
+        } else {
+            btn.disabled = true;
+        }
+        revisarCampos(); // Avisamos al vigilante principal
+    }
+
+       async function extraerDatosCurp() {
+        const curp = document.getElementById('curp').value.trim();
+        const btn = document.getElementById('btnBuscarCurp');
+        const campoValidacion = document.getElementById('validarCurp');
+        
+        btn.disabled = true;
+        // Estado de carga en el nuevo campo
+        campoValidacion.value = '⏳ Conectando con RENAPO...';
+        campoValidacion.style.color = 'var(--accent)';
+        campoValidacion.style.borderColor = 'var(--accent)';
+
+        try {
+            const urlApi = 'https://api-curp.onrender.com/scrape-curp?curp=' + curp;            
+            const respuesta = await fetch(urlApi);
+            const datos = await respuesta.json();
+
+            if (!respuesta.ok) {
+                if (datos.error === 'CURP_NO_EXISTENTE') {
+                    throw new Error('CURP_NO_EXISTENTE');
                 }
-            });
+                throw new Error(datos.error || 'No se encontró información');
+            }
+
+            if(datos.nombre && datos.nombre !== 'No encontrado') {
+                document.getElementById('nombre').value = datos.nombre;
+            }
+            if(datos.primerApellido && datos.primerApellido !== 'No encontrado') {
+                document.getElementById('apellidoPaterno').value = datos.primerApellido;
+            }
+            if(datos.segundoApellido && datos.segundoApellido !== 'No encontrado') {
+                document.getElementById('apellidoMaterno').value = datos.segundoApellido;
+            }
+            if(datos.entidadNacimiento && datos.entidadNacimiento !== 'No encontrado') {
+                document.getElementById('entidadFederativa').value = datos.entidadNacimiento;
+            }
             
-            // Si todos están llenos, quitamos el atributo disabled
-            botonGenerar.disabled = !todosLlenos;
+            if(datos.fechaNacimiento && datos.fechaNacimiento.includes('/')) {
+                const partes = datos.fechaNacimiento.split('/');
+                if(partes.length === 3) {
+                    document.getElementById('fechaNacimiento').value = `${partes[2]}-${partes[1]}-${partes[0]}`;
+                }
+            }
+
+            // Estado de éxito en el nuevo campo
+            campoValidacion.value = '✓ DATOS COMPLETADOS';
+            campoValidacion.style.color = 'var(--success)';
+            campoValidacion.style.borderColor = 'var(--success)';
+
+            const camposModificados = ['nombre', 'apellidoPaterno', 'apellidoMaterno', 'entidadFederativa', 'fechaNacimiento'];
+            camposModificados.forEach(id => {
+                document.getElementById(id).dispatchEvent(new Event('input'));
+            });
+
+            setTimeout(() => { btn.disabled = false; }, 3000);
+
+        } catch (error) {
+            btn.disabled = false;
+            
+            // Manejo de errores reflejados en el nuevo campo
+            campoValidacion.style.color = '#ef4444';
+            campoValidacion.style.borderColor = '#ef4444';
+
+            if (error.message === 'CURP_NO_EXISTENTE') {
+                campoValidacion.value = 'CURP NO EXISTENTE';
+            } else if (error.message.includes('timeout') || error.message.includes('30000') || error.message.includes('60000')) {
+                campoValidacion.value = 'TIEMPO AGOTADO - REINTENTA';
+            } else {
+                campoValidacion.value = '❌ ERROR: ' + error.message;
+            }
+        }
+    }
+    
+        // --- LÓGICA DE BÚSQUEDA DE CÓDIGO POSTAL ---
+    async function buscarCP() {
+        const inputCp = document.getElementById('cp');
+        const cp = inputCp.value.trim();
+        const statusCp = document.getElementById('statusCp');
+        const inputColonia = document.getElementById('colonia');
+        const inputEstado = document.getElementById('entidadFederativa');
+        const inputMunicipio = document.getElementById('municipioDelegacion');
+
+        if (cp.length !== 5 || isNaN(cp)) {
+            statusCp.style.display = 'none';
+            return;
         }
 
-        // Le decimos a cada input que avise cada vez que el usuario escriba o cambie algo
-        todosLosInputs.forEach(input => {
-            input.addEventListener('input', revisarCampos);
-            input.addEventListener('change', revisarCampos); // Especial para los calendarios
-        });
+        statusCp.style.display = 'block';
+        statusCp.style.color = 'var(--accent)';
+        statusCp.innerText = '⏳ Buscando CP...';
 
-        // Hacemos una revisión inicial por si el navegador autocompleta algo
-        revisarCampos();
+        try {
+            const urlApi = 'https://api-curp.onrender.com/scrape-cp?cp=' + cp;
+            const respuesta = await fetch(urlApi);
+            const datos = await respuesta.json();
+
+            if (!respuesta.ok) throw new Error(datos.error || 'CP no encontrado');
+
+            // --- Adaptación al nuevo formato de 7 campos del servidor ---
+            const primerResultado = datos.resultadosCompletos[0];
+            inputEstado.value = primerResultado.estado.toUpperCase();
+            inputMunicipio.value = primerResultado.municipio.toUpperCase();
+
+            // Llenar opciones de Colonia (Select en lugar de Datalist)
+            inputColonia.innerHTML = '<option value="" disabled selected>Selecciona tu colonia</option>'; 
+            datos.resultadosCompletos.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.asentamiento.toUpperCase();
+                option.innerText = item.asentamiento.toUpperCase();
+                inputColonia.appendChild(option);
+            });
+            // ------------------------------------------------------------
+
+            statusCp.style.color = 'var(--success)';
+            statusCp.innerText = '✓ CP Encontrado';
+
+            ['entidadFederativa', 'municipioDelegacion', 'colonia'].forEach(id => {
+                document.getElementById(id).dispatchEvent(new Event('input'));
+            });
+
+            setTimeout(() => { statusCp.style.display = 'none'; }, 3000);
+
+        } catch (error) {
+            statusCp.style.color = '#ef4444';
+            statusCp.innerText = '❌ ' + error.message;
+            
+            inputEstado.value = '';
+            inputMunicipio.value = '';
+            inputColonia.innerHTML = '<option value="">Ingresa un CP válido...</option>';
+        }
+    }
+    // -------------------------------------------
+
+
+    // ----------------------------------
+
+    // --- VIGILANTE DE CAMPOS LLENOS ---
+    const todosLosInputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="date"], select');
+    const botonGenerar = document.getElementById('btnGenerar');
+
+    function revisarCampos() {
+        let todosLlenos = true;
+        todosLosInputs.forEach(input => {
+            if (input.value.trim() === '') {
+                todosLlenos = false;
+            }
+        });
+        botonGenerar.disabled = !todosLlenos;
+    }
+
+    todosLosInputs.forEach(input => {
+        input.addEventListener('input', revisarCampos);
+        input.addEventListener('change', revisarCampos); 
     });
-    // -------------------------------------------------
+
+    document.addEventListener('DOMContentLoaded', revisarCampos);
+    // ---------------------------------
+    
+        // --- VIGILANTE PARA AUTOGENERAR RFC ---
+    const inputsParaRFC = ['nombre', 'apellidoPaterno', 'apellidoMaterno', 'fechaNacimiento'];
+    
+    function revisarCamposParaRFC() {
+        const nombreVal = document.getElementById('nombre').value.trim();
+        const paternoVal = document.getElementById('apellidoPaterno').value.trim();
+        const fechaVal = document.getElementById('fechaNacimiento').value;
+        
+        // El apellido materno es opcional, así que pedimos mínimo Nombre, Paterno y Fecha
+        if (nombreVal !== '' && paternoVal !== '' && fechaVal !== '') {
+            calcularYAsignarRFC(); // Llama a la fusión automáticamente
+        } else {
+            // Si borran algún dato clave, limpiamos el RFC
+            const inputRFC = document.getElementById('rfc');
+            inputRFC.value = '';
+            inputRFC.dispatchEvent(new Event('input'));
+        }
+    }
+
+    // Escuchamos los cambios en los campos
+    inputsParaRFC.forEach(id => {
+        const input = document.getElementById(id);
+        if (input) {
+            input.addEventListener('input', revisarCamposParaRFC);
+            input.addEventListener('change', revisarCamposParaRFC);
+        }
+    });
+    // ---------------------------------------------------
+
 
     function generarEnlace() {
         const valores = [
@@ -531,6 +814,128 @@
         enlaceDescarga.click();
         document.body.removeChild(enlaceDescarga);
     }
+    
+        // --- LÓGICA DE GENERACIÓN DE RFC (FUSIONADA) ---
+    function calcularYAsignarRFC() {
+        let nombreRaw = document.getElementById("nombre").value;
+        let paternoRaw = document.getElementById("apellidoPaterno").value;
+        let maternoRaw = document.getElementById("apellidoMaterno").value;
+        let fecha = document.getElementById("fechaNacimiento").value;
+
+        let nombre = filtrarPalabras(limpiarCadena(nombreRaw));
+        let paterno = filtrarPalabras(limpiarCadena(paternoRaw));
+        let materno = maternoRaw ? filtrarPalabras(limpiarCadena(maternoRaw)) : "";
+
+        let letrasRFC = calcularLetrasBase(nombre, paterno, materno);
+        // Formatear fecha de AAAA-MM-DD a AAMMDD
+        let fechaRFC = fecha.substring(2, 4) + fecha.substring(5, 7) + fecha.substring(8, 10);
+        
+        let nombreCompletoHomo = paterno + " " + (materno ? materno + " " : "") + nombre;
+        let homoclave = calcularHomoclave(nombreCompletoHomo);
+
+        let rfcBase12 = letrasRFC + fechaRFC + homoclave;
+        let digitoVerificador = calcularDigitoVerificador(rfcBase12);
+
+        let rfcFinal = rfcBase12 + digitoVerificador;
+
+        // Asignar el RFC generado a la casilla y avisar al vigilante principal
+        const inputRFC = document.getElementById("rfc");
+        inputRFC.value = rfcFinal;
+        inputRFC.dispatchEvent(new Event('input')); // Activa el botón final si todo está listo
+    }
+
+    function limpiarCadena(str) {
+        str = str.toUpperCase().trim();
+        str = str.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); 
+        str = str.replace(/[^A-ZÑ ]/g, ""); 
+        return str;
+    }
+
+    function filtrarPalabras(str) {
+        const palabrasIgnoradas = ["DA", "DAS", "DE", "DEL", "DER", "DI", "DIE", "DD", "EL", "LA", "LOS", "LAS", "LE", "LES", "MAC", "MC", "VAN", "VON", "Y"];
+        let filtrado = str.split(" ").filter(p => !palabrasIgnoradas.includes(p) && p !== "");
+        return filtrado.join(" ");
+    }
+
+    function calcularLetrasBase(nombre, paterno, materno) {
+        let nombresArr = nombre.split(" ");
+        if (nombresArr.length > 1 && (nombresArr[0] === "JOSE" || nombresArr[0] === "MARIA")) {
+            nombresArr.shift();
+        }
+        let nombreUsado = nombresArr[0];
+
+        let p1 = paterno.charAt(0) || 'X';
+        let p2 = 'X';
+        for (let i = 1; i < paterno.length; i++) {
+            if (/[AEIOU]/.test(paterno.charAt(i))) {
+                p2 = paterno.charAt(i);
+                break;
+            }
+        }
+        let m1 = materno ? materno.charAt(0) : 'X';
+        let n1 = nombreUsado.charAt(0) || 'X';
+
+        if (paterno.length <= 2) {
+            p2 = materno ? materno.charAt(0) : 'X';
+            m1 = nombreUsado.charAt(0) || 'X';
+            n1 = nombreUsado.charAt(1) || 'X';
+        }
+
+        let letras = (p1 + p2 + m1 + n1).replace(/Ñ/g, 'X');
+
+        const antisonantes = ['BUEI','BUEY','CACA','CACO','CAGA','CAGO','CAKA','CAKO','COGE','COJA','COJE','COJI','COJO','CULO','FETO','GUEY','JOTO','KACA','KACO','KAGA','KAGO','COKA','COKO','KAKA','KAKO','KOGE','KOJO','KULO','MAME','MAMO','MEAR','MEAS','MEON','MION','MOCO','MULA','PEDA','PEDO','PENE','PUTA','PUTO','QULO','RATA','RUIN'];
+        if (antisonantes.includes(letras)) {
+            letras = letras.substring(0, 3) + 'X';
+        }
+        return letras;
+    }
+
+    function calcularHomoclave(nombreCompleto) {
+        const tabla = {
+            ' ': '00', '0': '00', '1': '01', '2': '02', '3': '03', '4': '04', '5': '05',
+            '6': '06', '7': '07', '8': '08', '9': '09', '&': '10', 'A': '11', 'B': '12',
+            'C': '13', 'D': '14', 'E': '15', 'F': '16', 'G': '17', 'H': '18', 'I': '19',
+            'J': '21', 'K': '22', 'L': '23', 'M': '24', 'N': '25', 'O': '26', 'P': '27',
+            'Q': '28', 'R': '29', 'S': '32', 'T': '33', 'U': '34', 'V': '35', 'W': '36',
+            'X': '37', 'Y': '38', 'Z': '39', 'Ñ': '40'
+        };
+
+        let cadenaNums = "0";
+        for (let i = 0; i < nombreCompleto.length; i++) {
+            cadenaNums += tabla[nombreCompleto.charAt(i)] || '00';
+        }
+
+        let suma = 0;
+        for (let i = 0; i < cadenaNums.length - 1; i++) {
+            let v1 = parseInt(cadenaNums.substring(i, i + 2));
+            let v2 = parseInt(cadenaNums.substring(i + 1, i + 2));
+            suma += (v1 * v2);
+        }
+
+        let tresUltimos = suma % 1000;
+        let cociente = Math.floor(tresUltimos / 34);
+        let residuo = tresUltimos % 34;
+
+        const eq = "123456789ABCDEFGHIJKLMNPQRSTUVWXYZ";
+        return eq.charAt(cociente) + eq.charAt(residuo);
+    }
+
+    function calcularDigitoVerificador(rfc12) {
+        const dic = "0123456789ABCDEFGHIJKLMN&OPQRSTUVWXYZ Ñ";
+        let suma = 0;
+        
+        for (let i = 0; i < 12; i++) {
+            let valor = dic.indexOf(rfc12.charAt(i));
+            suma += valor * (13 - i);
+        }
+
+        let mod = suma % 11;
+        if (mod === 0) return "0";
+        let digito = 11 - mod;
+        if (digito === 10) return "A";
+        return digito.toString();
+    }
+
 </script>
 
 </body>
