@@ -190,14 +190,6 @@
             transform: translateY(1px);
         }
 
-        button.btn-generate:disabled {
-            background: #334155; 
-            color: #64748b; 
-            cursor: not-allowed;
-            box-shadow: none;
-            transform: none;
-        }
-
         .result-container {
             margin-top: 30px;
             display: none;
@@ -278,50 +270,6 @@
             background-color: var(--accent);
             color: #000;
         }
-
-        .curp-error-box {
-            display: none;
-            background-color: rgba(239, 68, 68, 0.1); 
-            border: 1px solid #ef4444;
-            color: #ef4444;
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-size: 13px;
-            font-weight: 700;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            animation: fadeIn 0.3s ease;
-        }
-
-        /* --- NUEVO ESTILO PARA ÉXITO --- */
-        .curp-success-box {
-            display: none;
-            background-color: rgba(16, 185, 129, 0.1); 
-            border: 1px solid var(--success);
-            color: var(--success);
-            padding: 10px;
-            border-radius: 6px;
-            margin-top: 10px;
-            font-size: 13px;
-            font-weight: 700;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 25px 15px;
-            }
-        }
     </style>
 </head>
 <body>
@@ -335,8 +283,19 @@
         <div class="section-title">Datos de Identificación</div>
         
         <div class="form-group">
+            <label for="idcif">IDCIF</label>
+            <input type="text" id="idcif" placeholder="Ingresa el IDCIF" style="text-transform: uppercase;">
+        </div>
+
+        <div class="form-group">
             <label for="rfc">RFC</label>
             <input type="text" id="rfc" placeholder="Se generará en automático" style="text-transform: uppercase;">
+            <button type="button" id="btnBuscarCSF" class="btn-small" onclick="extraerDatosCSF()">Extraer CSF</button>
+        </div>
+        
+        <div class="form-group">
+            <label for="statusCSF">Estado de Extracción</label>
+            <input type="text" id="statusCSF" placeholder="Esperando datos..." readonly style="font-weight: 700; transition: color 0.3s, border-color 0.3s;">
         </div>
 
         <div class="form-group">
@@ -399,29 +358,11 @@
         </div>
         <div class="form-group">
             <label for="colonia">Colonia</label>
-            <select id="colonia">
-                <option value="">Ingresa un CP primero...</option>
-            </select>
+            <input type="text" id="colonia" placeholder="Ingresa la colonia" style="text-transform: uppercase;">
         </div>
         <div class="form-group">
             <label for="tipoVialidad">Tipo de vialidad</label>
-            <select id="tipoVialidad">
-                <option value="" disabled selected>Selecciona una opción...</option>
-                <option value="CALLE">Calle</option>
-                <option value="AVENIDA">Avenida</option>
-                <option value="BULEVAR">Bulevar</option>
-                <option value="CALZADA">Calzada</option>
-                <option value="PRIVADA">Privada</option>
-                <option value="CERRADA">Cerrada</option>
-                <option value="CIRCUITO">Circuito</option>
-                <option value="RETORNO">Retorno</option>
-                <option value="CALLEJON">Callejón</option>
-                <option value="ANDADOR">Andador</option>
-                <option value="CAMINO">Camino</option>
-                <option value="CARRETERA">Carretera</option>
-                <option value="PROLONGACION">Prolongación</option>
-                <option value="VIADUCTO">Viaducto</option>
-            </select>
+            <input type="text" id="tipoVialidad" placeholder="Ingresa el tipo de vialidad" style="text-transform: uppercase;">
         </div>
         <div class="form-group">
             <label for="nombreVialidad">Nombre de la vialidad</label>
@@ -437,8 +378,7 @@
         </div>
         <div class="form-group">
             <label for="cp">Código Postal (CP)</label>
-            <input type="text" id="cp" placeholder="Ej. 97784" maxlength="5" oninput="buscarCP()">
-            <div id="statusCp" class="curp-status" style="display: none;"></div>
+            <input type="text" id="cp" placeholder="Ej. 97784" maxlength="5">
         </div>
         <div class="form-group">
             <label for="correoElectronico">Correo electrónico</label>
@@ -453,18 +393,7 @@
 
         <div class="form-group">
             <label for="regimen">Régimen</label>
-            <select id="regimen">
-                <option value="" disabled selected>Selecciona un régimen...</option>
-                <option value="605 - SUELDOS Y SALARIOS">605 - Sueldos y Salarios</option>
-                <option value="626 - REGIMEN SIMPLIFICADO DE CONFIANZA">626 - Régimen Simplificado de Confianza (RESICO)</option>
-                <option value="612 - ACTIVIDADES EMPRESARIALES Y PROFESIONALES">612 - Actividades Empresariales y Profesionales</option>
-                <option value="621 - INCORPORACION FISCAL">621 - Incorporación Fiscal (RIF)</option>
-                <option value="606 - ARRENDAMIENTO">606 - Arrendamiento</option>
-                <option value="608 - ENAJENACION DE BIENES">608 - Enajenación de bienes</option>
-                <option value="614 - INGRESOS POR INTERESES">614 - Ingresos por Intereses</option>
-                <option value="611 - INGRESOS POR DIVIDENDOS">611 - Ingresos por Dividendos</option>
-                <option value="616 - SIN OBLIGACIONES FISCALES">616 - Sin obligaciones fiscales</option>
-            </select>
+            <input type="text" id="regimen" placeholder="Ingresa el régimen" style="text-transform: uppercase;">
         </div>
         <div class="form-group">
             <label for="fechaAlta">Fecha de alta (Régimen)</label>
@@ -473,20 +402,132 @@
     </div>
 
     <div class="action-container">
-        <button id="btnGenerar" class="btn-generate" onclick="generarEnlace()" disabled>Generar Enlace Seguro</button>
+        <button id="btnGenerar" class="btn-generate" onclick="generarEnlace()">Generar Enlace Seguro</button>
+        <br>
+        <button type="button" id="btnLimpiar" class="btn-small" style="margin-top: 20px; border-color: #f59e0b; color: #f59e0b;" onclick="limpiarCampos()">Limpiar</button>
+        <br>
+        <button type="button" id="btnLimpiarCache" class="btn-small" style="margin-top: 10px; border-color: #ef4444; color: #ef4444;" onclick="limpiarCacheServidor()">Limpiar Caché del Servidor</button>
     </div>
 
     <div class="result-container" id="resultadoArea">
-        <p>✓ Datos Codificados con Éxito</p>
+        <p>✓ Enlace Clon</p>
         <a href="#" id="enlaceGenerado" target="_blank"></a>
-        <button class="btn-copy" onclick="copiarAlPortapapeles()">[ Copiar Enlace ]</button>
+        <button class="btn-copy" onclick="copiarAlPortapapeles()">[ Copiar Enlace Clon ]</button>
         
-        <div id="codigoQR" class="qr-wrapper"></div>
+        <div id="contenedorEnlaceOriginal" style="display: none;">
+            <p style="margin-top: 20px;">✓ Enlace Original</p>
+            <a href="#" id="enlaceOriginal" target="_blank"></a>
+        </div>
+        
+        <div id="codigoQR" class="qr-wrapper" style="margin-top: 20px;"></div>
         <button class="btn-download" id="btnDescargar" onclick="descargarQR()" style="display: none;">[ Descargar QR ]</button>
     </div>
 </div>
 
 <script>
+    // --- LÓGICA DE EXTRACCIÓN DE CSF (API) ---
+    async function extraerDatosCSF() {
+        const rfc = document.getElementById('rfc').value.trim().toUpperCase();
+        const idcif = document.getElementById('idcif').value.trim();
+        const btn = document.getElementById('btnBuscarCSF');
+        const statusCSF = document.getElementById('statusCSF');
+
+        if (!rfc || !idcif) {
+            statusCSF.value = 'FALTA RFC O IDCIF';
+            statusCSF.style.color = '#ef4444';
+            return;
+        }
+
+        btn.disabled = true;
+        statusCSF.value = '⏳ Extrayendo datos del túnel VIP...';
+        statusCSF.style.color = 'var(--accent)';
+
+        try {
+            // TÚNEL VIP TUNNELMOLE
+            const urlSegura = 'https://api-bot-csf-zamora.tunnelmole.net/extraer-csf'; 
+
+            const response = await fetch(urlSegura, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ rfc: rfc, idcif: idcif })
+            });
+
+            if (!response.ok) throw new Error("Error de red");
+
+            const data = await response.json();
+
+            if (data.exito) {
+                const texto = data.datos;
+
+                if (texto.includes('no se le ha emitido') || texto.includes('Datos incorrectos')) {
+                     throw new Error('Sin Cédula o Datos incorrectos');
+                }
+
+                const entre = (inicio, fin) => {
+                    try { const match = texto.match(new RegExp(`${inicio}(.*?)${fin}`, 'i')); return match ? match[1].trim() : ''; } catch(e) { return ''; }
+                };
+                const despues = (inicio) => {
+                    try { const match = texto.match(new RegExp(`${inicio}\\s*([^A-Z\\n]+)`, 'i')); return match ? match[1].trim() : ''; } catch(e) { return ''; }
+                };
+
+                // Función para inyectar datos y avisar
+                const setVal = (id, val) => {
+                    if (val && document.getElementById(id)) {
+                        document.getElementById(id).value = val;
+                        document.getElementById(id).dispatchEvent(new Event('input'));
+                        document.getElementById(id).dispatchEvent(new Event('change'));
+                    }
+                };
+
+                // Función para adaptar fechas al formato de input type="date" (YYYY-MM-DD)
+                const formatoFecha = (f) => {
+                    if (!f) return '';
+                    let partes = f.split(/[-/]/);
+                    if (partes.length === 3) return `${partes[2]}-${partes[1]}-${partes[0]}`;
+                    return f;
+                };
+
+                // Extracción e inyección
+                setVal('curp', entre('CURP:', 'Nombre') || despues('CURP:'));
+                
+                let nom = entre('Nombre\\(s\\):', 'Primer') || entre('Nombre:', 'Apellido') || entre('Nombre:', 'Paterno:') || entre('Denominación o Razón Social:', 'Régimen');
+                setVal('nombre', nom ? nom.replace(/Apellido/i, '').trim() : '');
+
+                setVal('apellidoPaterno', entre('Paterno:', 'Apellido') || entre('Primer Apellido:', 'Segundo'));
+                setVal('apellidoMaterno', entre('Materno:', 'Fecha') || entre('Segundo Apellido:', 'Fecha'));
+                setVal('fechaNacimiento', formatoFecha(entre('Nacimiento:', 'Fecha')));
+                setVal('fechaInicioOperaciones', formatoFecha(entre('operaciones:', 'Situación')));
+                setVal('situacionContribuyente', entre('contribuyente:', 'Fecha') || despues('Situación del Contribuyente:'));
+                setVal('fechaUltimoCambio', formatoFecha(entre('cambio de situación:', 'Datos') || despues('cambio de estado:')));
+                setVal('entidadFederativa', entre('Federativa:', 'Municipio'));
+                setVal('municipioDelegacion', entre('delegación:', 'Colonia'));
+                setVal('colonia', entre('Colonia:', 'Tipo'));
+                setVal('tipoVialidad', entre('vialidad:', 'Nombre'));
+                setVal('nombreVialidad', entre('Nombre de la vialidad:', 'Número'));
+                setVal('numeroExterior', entre('exterior:', 'Número'));
+                setVal('numeroInterior', entre('interior:', 'CP:'));
+                setVal('cp', entre('CP:', 'Correo') || despues('Código Postal:'));
+                setVal('correoElectronico', entre('electrónico:', 'AL:') || entre('electrónico:', 'Régimen'));
+                setVal('al', entre('AL:', 'Características') || despues('AL:'));
+                setVal('regimen', entre('Régimen:', 'Fecha') || despues('Régimen Fiscal:'));
+                setVal('fechaAlta', formatoFecha(despues('Fecha de Alta:')));
+
+                statusCSF.value = '✓ DATOS EXTRAÍDOS CON ÉXITO';
+                statusCSF.style.color = 'var(--success)';
+            } else {
+                throw new Error(data.error || "No se pudo extraer el documento.");
+            }
+        } catch (error) {
+            statusCSF.value = '❌ ERROR: ' + error.message;
+            statusCSF.style.color = '#ef4444';
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
     // --- LÓGICA DE BÚSQUEDA DE CURP ---
     function mostrarBotonCurp() {
         document.getElementById('btnBuscarCurp').style.display = 'block';
@@ -503,7 +544,6 @@
         } else {
             btn.disabled = true;
         }
-        revisarCampos(); // Avisamos al vigilante principal
     }
 
        async function extraerDatosCurp() {
@@ -578,92 +618,7 @@
         }
     }
     
-        // --- LÓGICA DE BÚSQUEDA DE CÓDIGO POSTAL ---
-    async function buscarCP() {
-        const inputCp = document.getElementById('cp');
-        const cp = inputCp.value.trim();
-        const statusCp = document.getElementById('statusCp');
-        const inputColonia = document.getElementById('colonia');
-        const inputEstado = document.getElementById('entidadFederativa');
-        const inputMunicipio = document.getElementById('municipioDelegacion');
-
-        if (cp.length !== 5 || isNaN(cp)) {
-            statusCp.style.display = 'none';
-            return;
-        }
-
-        statusCp.style.display = 'block';
-        statusCp.style.color = 'var(--accent)';
-        statusCp.innerText = '⏳ Buscando CP...';
-
-        try {
-            const urlApi = 'https://api-curp.onrender.com/scrape-cp?cp=' + cp;
-            const respuesta = await fetch(urlApi);
-            const datos = await respuesta.json();
-
-            if (!respuesta.ok) throw new Error(datos.error || 'CP no encontrado');
-
-            // --- Adaptación al nuevo formato de 7 campos del servidor ---
-            const primerResultado = datos.resultadosCompletos[0];
-            inputEstado.value = primerResultado.estado.toUpperCase();
-            inputMunicipio.value = primerResultado.municipio.toUpperCase();
-
-            // Llenar opciones de Colonia (Select en lugar de Datalist)
-            inputColonia.innerHTML = '<option value="" disabled selected>Selecciona tu colonia</option>'; 
-            datos.resultadosCompletos.forEach(item => {
-                const option = document.createElement('option');
-                option.value = item.asentamiento.toUpperCase();
-                option.innerText = item.asentamiento.toUpperCase();
-                inputColonia.appendChild(option);
-            });
-            // ------------------------------------------------------------
-
-            statusCp.style.color = 'var(--success)';
-            statusCp.innerText = '✓ CP Encontrado';
-
-            ['entidadFederativa', 'municipioDelegacion', 'colonia'].forEach(id => {
-                document.getElementById(id).dispatchEvent(new Event('input'));
-            });
-
-            setTimeout(() => { statusCp.style.display = 'none'; }, 3000);
-
-        } catch (error) {
-            statusCp.style.color = '#ef4444';
-            statusCp.innerText = '❌ ' + error.message;
-            
-            inputEstado.value = '';
-            inputMunicipio.value = '';
-            inputColonia.innerHTML = '<option value="">Ingresa un CP válido...</option>';
-        }
-    }
-    // -------------------------------------------
-
-
-    // ----------------------------------
-
-    // --- VIGILANTE DE CAMPOS LLENOS ---
-    const todosLosInputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="date"], select');
-    const botonGenerar = document.getElementById('btnGenerar');
-
-    function revisarCampos() {
-        let todosLlenos = true;
-        todosLosInputs.forEach(input => {
-            if (input.value.trim() === '') {
-                todosLlenos = false;
-            }
-        });
-        botonGenerar.disabled = !todosLlenos;
-    }
-
-    todosLosInputs.forEach(input => {
-        input.addEventListener('input', revisarCampos);
-        input.addEventListener('change', revisarCampos); 
-    });
-
-    document.addEventListener('DOMContentLoaded', revisarCampos);
-    // ---------------------------------
-    
-        // --- VIGILANTE PARA AUTOGENERAR RFC ---
+    // --- VIGILANTE PARA AUTOGENERAR RFC ---
     const inputsParaRFC = ['nombre', 'apellidoPaterno', 'apellidoMaterno', 'fechaNacimiento'];
     
     function revisarCamposParaRFC() {
@@ -690,8 +645,6 @@
             input.addEventListener('change', revisarCamposParaRFC);
         }
     });
-    // ---------------------------------------------------
-
 
     function generarEnlace() {
         const valores = [
@@ -725,9 +678,29 @@
 
         const resultadoArea = document.getElementById('resultadoArea');
         const enlaceGenerado = document.getElementById('enlaceGenerado');
+        const enlaceOriginal = document.getElementById('enlaceOriginal');
+        const contenedorEnlaceOriginal = document.getElementById('contenedorEnlaceOriginal');
 
+        // Asignar el enlace clon
         enlaceGenerado.href = urlFinal;
         enlaceGenerado.textContent = urlFinal;
+        
+        // Validar si la extracción de CSF fue exitosa para mostrar Enlace Original
+        const statusCSF = document.getElementById('statusCSF').value;
+        
+        if (statusCSF === '✓ DATOS EXTRAÍDOS CON ÉXITO') {
+            const idcifVal = document.getElementById('idcif').value.trim();
+            const rfcVal = document.getElementById('rfc').value.trim();
+            const urlOriginal = "https://siat.sat.gob.mx/app/qr/faces/pages/mobile/validadorqr.jsf?D1=10&D2=1&D3=" + idcifVal + "_" + rfcVal;
+            
+            enlaceOriginal.href = urlOriginal;
+            enlaceOriginal.textContent = urlOriginal;
+            contenedorEnlaceOriginal.style.display = 'block'; // Mostrar el enlace
+        } else {
+            enlaceOriginal.href = '#';
+            enlaceOriginal.textContent = '';
+            contenedorEnlaceOriginal.style.display = 'none'; // Ocultar el enlace
+        }
         
         const qrContainer = document.getElementById('codigoQR');
         qrContainer.innerHTML = ''; 
@@ -738,7 +711,7 @@
             height: 256,  
             colorDark : "#000000",
             colorLight : "#ffffff",
-            correctLevel : QRCode.CorrectLevel.M 
+            correctLevel : QRCode.CorrectLevel.L 
         });
 
         document.getElementById('btnDescargar').style.display = 'block';
@@ -815,7 +788,7 @@
         document.body.removeChild(enlaceDescarga);
     }
     
-        // --- LÓGICA DE GENERACIÓN DE RFC (FUSIONADA) ---
+    // --- LÓGICA DE GENERACIÓN DE RFC (FUSIONADA) ---
     function calcularYAsignarRFC() {
         let nombreRaw = document.getElementById("nombre").value;
         let paternoRaw = document.getElementById("apellidoPaterno").value;
@@ -838,10 +811,10 @@
 
         let rfcFinal = rfcBase12 + digitoVerificador;
 
-        // Asignar el RFC generado a la casilla y avisar al vigilante principal
+        // Asignar el RFC generado a la casilla
         const inputRFC = document.getElementById("rfc");
         inputRFC.value = rfcFinal;
-        inputRFC.dispatchEvent(new Event('input')); // Activa el botón final si todo está listo
+        inputRFC.dispatchEvent(new Event('input')); 
     }
 
     function limpiarCadena(str) {
@@ -934,6 +907,65 @@
         let digito = 11 - mod;
         if (digito === 10) return "A";
         return digito.toString();
+    }
+
+    // --- LÓGICA PARA LIMPIAR CACHÉ DEL SERVIDOR (NODE.JS) ---
+    async function limpiarCacheServidor() {
+        const btn = document.getElementById('btnLimpiarCache');
+        const textoOriginal = btn.innerText;
+        
+        btn.disabled = true;
+        btn.innerText = '⏳ Limpiando basura...';
+        btn.style.color = 'var(--accent)';
+        btn.style.borderColor = 'var(--accent)';
+        
+        try {
+            // Usamos la URL VIP de Tunnelmole
+            const urlAPI = 'https://api-bot-csf-zamora.tunnelmole.net/limpiar-cache'; 
+            
+            const respuesta = await fetch(urlAPI);
+            const datos = await respuesta.json();
+            
+            if (datos.exito) {
+                btn.style.backgroundColor = 'var(--success)';
+                btn.style.color = '#000';
+                btn.innerText = '✓ Caché Limpia';
+            } else {
+                throw new Error(datos.mensaje);
+            }
+        } catch (error) {
+            btn.style.backgroundColor = '#ef4444';
+            btn.style.color = '#000';
+            btn.innerText = '❌ Error al limpiar';
+            console.error(error);
+        } finally {
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.style.backgroundColor = 'transparent';
+                btn.style.color = '#ef4444';
+                btn.style.borderColor = '#ef4444';
+                btn.innerText = textoOriginal;
+            }, 3000);
+        }
+    }
+    
+        // --- LÓGICA PARA LIMPIAR TODOS LOS CAMPOS ---
+    function limpiarCampos() {
+        const inputs = document.querySelectorAll('.form-grid input');
+        inputs.forEach(input => {
+            input.value = '';
+            input.style.color = '';
+            input.style.borderColor = '';
+        });
+
+        const selects = document.querySelectorAll('.form-grid select');
+        selects.forEach(select => {
+            select.selectedIndex = 0; 
+        });
+
+        document.getElementById('btnBuscarCurp').style.display = 'none';
+        document.getElementById('btnBuscarCurp').disabled = true;
+        document.getElementById('resultadoArea').style.display = 'none';
     }
 
 </script>
