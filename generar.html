@@ -558,7 +558,7 @@
         campoValidacion.style.borderColor = 'var(--accent)';
 
         try {
-            const urlApi = 'https://api-curp.onrender.com/scrape-curp?curp=' + curp;            
+            const urlApi = 'https://api-curp-production.up.railway.app/scrape-curp?curp=' + curp;            
             const respuesta = await fetch(urlApi);
             const datos = await respuesta.json();
 
